@@ -1,8 +1,8 @@
--- 
+--
 -- Pregunta
 -- ===========================================================================
 --
--- Escriba una consulta que retorne unicamente la columna t0.c5 con sus 
+-- Escriba una consulta que retorne unicamente la columna t0.c5 con sus
 -- elementos en mayuscula.
 --
 -- Escriba el resultado a la carpeta `output` de directorio de trabajo.
@@ -13,10 +13,10 @@ CREATE TABLE tbl0 (
     c2 STRING,
     c3 INT,
     c4 DATE,
-    c5 ARRAY<CHAR(1)>, 
+    c5 ARRAY<CHAR(1)>,
     c6 MAP<STRING, INT>
 )
-ROW FORMAT DELIMITED 
+ROW FORMAT DELIMITED
 FIELDS TERMINATED BY ','
 COLLECTION ITEMS TERMINATED BY ':'
 MAP KEYS TERMINATED BY '#'
@@ -30,7 +30,7 @@ CREATE TABLE tbl1 (
     c3 STRING,
     c4 MAP<STRING, INT>
 )
-ROW FORMAT DELIMITED 
+ROW FORMAT DELIMITED
 FIELDS TERMINATED BY ','
 COLLECTION ITEMS TERMINATED BY ':'
 MAP KEYS TERMINATED BY '#'
@@ -39,5 +39,28 @@ LOAD DATA LOCAL INPATH 'tbl1.csv' INTO TABLE tbl1;
 --
 -- >>> Escriba su respuesta a partir de este punto <<<
 --
+DROP TABLE IF EXISTS mayusc;
+CREATE TABLE mayusc AS
+SELECT
+    c1,
+    upper(letter) AS letter
+FROM
+    tbl0
+LATERAL VIEW
+    explode(c5) tbl0 AS letter;
+SELECT * FROM mayusc;
 
+DROP TABLE IF EXISTS final;
+CREATE TABLE final AS
+SELECT
+    collect_list(letter) AS c5t
+FROM
+    mayusc
+GROUP BY
+    c1;
+SELECT * FROM final;
 
+INSERT OVERWRITE LOCAL DIRECTORY 'output'
+ROW FORMAT DELIMITED
+COLLECTION ITEMS TERMINATED BY ':'
+SELECT * FROM final;

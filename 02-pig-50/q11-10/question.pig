@@ -1,10 +1,10 @@
 -- Pregunta
 -- ===========================================================================
--- 
+--
 -- Para responder la pregunta use el archivo `data.csv`.
--- 
+--
 -- Escriba el código que genere la siguiente salida.
--- 
+--
 --    Boyer,BOYER,boyer
 --    Coffey,COFFEY,coffey
 --    Conway,CONWAY,conway
@@ -23,18 +23,26 @@
 --    Noel,NOEL,noel
 --    Sexton,SEXTON,sexton
 --    Silva,SILVA,silva
--- 
+--
 -- Escriba el resultado a la carpeta `output` del directorio actual.
--- 
+--
 fs -rm -f -r output;
 --
-u = LOAD 'data.csv' USING PigStorage(',') 
-    AS (id:int, 
-        firstname:CHARARRAY, 
-        surname:CHARARRAY, 
-        birthday:CHARARRAY, 
-        color:CHARARRAY, 
+u = LOAD 'data.csv' USING PigStorage(',')
+    AS (id:int,
+        firstname:CHARARRAY,
+        surname:CHARARRAY,
+        birthday:CHARARRAY,
+        color:CHARARRAY,
         quantity:INT);
 --
 -- >>> Escriba su respuesta a partir de este punto <<<
 --
+
+data = FOREACH u GENERATE ($2), UPPER($2), LOWER($2);
+data = ORDER data BY $2;
+
+
+
+-- Escribe el archivo de salida
+STORE data INTO 'output' USING PigStorage(',');

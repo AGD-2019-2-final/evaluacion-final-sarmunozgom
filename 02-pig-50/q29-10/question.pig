@@ -1,12 +1,12 @@
--- 
+--
 -- Pregunta
 -- ===========================================================================
--- 
+--
 -- Para responder la pregunta use el archivo `data.csv`.
--- 
--- Escriba el código en Pig para manipulación de fechas que genere la siguiente 
+--
+-- Escriba el código en Pig para manipulación de fechas que genere la siguiente
 -- salida.
--- 
+--
 --    1971-07-08,jul,07,7
 --    1974-05-23,may,05,5
 --    1973-04-22,abr,04,4
@@ -25,18 +25,36 @@
 --    1974-02-11,feb,02,2
 --    1973-04-01,abr,04,4
 --    1973-04-29,abr,04,4
--- 
+--
 -- Escriba el resultado a la carpeta `output` del directorio actual.
--- 
+--
 fs -rm -f -r output;
--- 
-u = LOAD 'data.csv' USING PigStorage(',') 
-    AS (id:int, 
-        firstname:CHARARRAY, 
-        surname:CHARARRAY, 
-        birthday:CHARARRAY, 
-        color:CHARARRAY, 
+--
+u = LOAD 'data.csv' USING PigStorage(',')
+    AS (id:int,
+        firstname:CHARARRAY,
+        surname:CHARARRAY,
+        birthday:CHARARRAY,
+        color:CHARARRAY,
         quantity:INT);
 --
 -- >>> Escriba su respuesta a partir de este punto <<<
 --
+data = FOREACH u GENERATE birthday, SUBSTRING(birthday,5,7), SUBSTRING(birthday,5,7) AS INT;
+data = FOREACH data GENERATE birthday, (CASE $2
+                            WHEN 1 THEN 'ene'
+                            WHEN 2 THEN 'feb'
+                            WHEN 3 THEN 'mar'
+                            WHEN 4 THEN 'abr'
+                            WHEN 5 THEN 'may'
+                            WHEN 6 THEN 'jun'
+                            WHEN 7 THEN 'jul'
+                            WHEN 8 THEN 'ago'
+                            WHEN 9 THEN 'sep'
+                            WHEN 10 THEN 'oct'
+                            WHEN 11 THEN 'nov'
+                            WHEN 12 THEN 'dic'
+                          END), SUBSTRING(birthday,5,7), SUBSTRING(birthday,5,7) AS INT;
+
+-- Escribe el archivo de salida
+STORE data INTO 'output' USING PigStorage(',');
